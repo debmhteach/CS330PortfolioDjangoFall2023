@@ -1,0 +1,14 @@
+<!-- inherit from base.html -->
+{% extends 'portfolio_app/base_template.html' %}
+
+<!-- Replace block content in base_template.html -->
+{% block content %}
+  <h1>Computer Science Student Portfolios</h1>
+
+  <h2>List of Students with Active Portfolios</h2>
+    <ul class="list-group">
+      {% for i in student_active_portfolios %}
+        <li class="list-group-item">{{i.name}}</li>
+      {% endfor %}
+    </ul>
+{% endblock %}

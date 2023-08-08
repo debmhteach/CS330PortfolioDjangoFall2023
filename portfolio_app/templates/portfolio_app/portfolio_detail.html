@@ -1,0 +1,24 @@
+{% extends 'portfolio_app/base_template.html' %}
+
+{% block content %}
+  <h1>Portfolio Title: {{ portfolio.title }}</h1>
+
+  <p><strong>Portfolio Active:</strong> {{ portfolio.is_active }}</p>
+  <p><strong>About:</strong> {{ portfolio.about }}</p>
+  <p><strong>Contact Email:</strong> {{ portfolio.email }}</p>
+
+  <p><strong>Projects:
+
+<!-- https://stackoverflow.com/questions/36721957/django-query-in-one-to-many-relationship-->
+    <ul>
+      {% for my_project in porfolio.projects.all %}
+      <li>
+        <a href="{{ my_project.get_absolute_url }}">{{ my_project.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+
+
+  
+  </div>
+{% endblock %}

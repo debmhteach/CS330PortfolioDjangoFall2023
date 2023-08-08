@@ -9,7 +9,8 @@ from django.views import generic
 def index(request): 
     #get all the students
     #active_portfolios = Portfolio.objects.filter(is_active=True)
-    student_active_portfolios = Student.objects.filter(portfolio__is_active=True)
+    #student_active_portfolios = Student.objects.filter(portfolio__is_active=True)
+    student_active_portfolios = Student.objects.select_related('portfolio').all().filter(portfolio__is_active=True)
     #pass dictionary of students to index template tage 
     return render( request, 'portfolio_app/index.html', {'student_active_portfolios':student_active_portfolios})
 
@@ -20,4 +21,19 @@ class StudentListView(generic.ListView):
     
 class StudentDetailView(generic.DetailView):
     model = Student
+
+
+
+class PortfolioListView(generic.ListView):
+    model = Portfolio
+    
+class PortfolioDetailView(generic.DetailView):
+    model = Portfolio
+
+
+class ProjectListView(generic.ListView):
+    model = Project
+    
+class ProjectDetailView(generic.DetailView):
+    model = Project
 

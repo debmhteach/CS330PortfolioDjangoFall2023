@@ -8,7 +8,12 @@
   <h2>List of Students with Active Portfolios</h2>
     <ul class="list-group">
       {% for i in student_active_portfolios %}
-        <li class="list-group-item">{{i.name}}</li>
+        <li class="list-group-item">Name: {{i.name}} 
+          <p><strong>Portfolio:<a href="{{ i.portfolio.get_absolute_url }}">{{ i.portfolio.title }} </a>
+
+
+
+        </li>
       {% endfor %}
     </ul>
 {% endblock %}

@@ -8,17 +8,19 @@
   <p><strong>Contact Email:</strong> {{ portfolio.email }}</p>
 
   <p><strong>Projects:
+    <a class="btn btn-primary" href="{% url 'create_project' portfolio.id %}" role="button">New</a>
 
-<!-- https://stackoverflow.com/questions/36721957/django-query-in-one-to-many-relationship-->
     <ul>
-      {% for my_project in porfolio.projects.all %}
+      {% for my_project in projects %}
       <li>
-        <a href="{{ my_project.get_absolute_url }}">{{ my_project.title }}</a>
+        {{ my_project.project.title }}
+        <a class="btn btn-primary" href="{{ my_project.project.get_absolute_url }}" role="button">View</a>
+        <a class="btn btn-primary" href="{% url 'update_project' portfolio.id my_project.project.id %}" role="button">Update</a>
+        <a class="btn btn-primary" href="{% url 'delete_project' portfolio.id my_project.project.id %}" role="button">Delete</a>
+        
       </li>
       {% endfor %}
     </ul>
-
-
-  
+ 
   </div>
 {% endblock %}

@@ -66,16 +66,20 @@ class Student(models.Model):
     class Meta:
         ordering = ['name']
 
-# In this setup, you have a separate model called ProjectInPortfolio 
-# to represent the relationship between projects and portfolios. 
+# Model to represent the relationship between projects and portfolios. 
 # Each instance of this model will have a reference to a Portfolio and a Project, 
 # creating a many-to-many relationship between portfolios and projects. T
-# he unique_together constraint ensures that each project is associated with a 
-# portfolio only once. 
 class ProjectInPortfolio(models.Model):
+
+    #deleting a portfolio will delete associate projects
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    #deleting a project will not affect the portfolio
+    #Just the entry will be removed from this table
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
+
+
     class Meta:
+        #ensures that each project is associated with only one portfolio
         unique_together = ('portfolio', 'project')
    

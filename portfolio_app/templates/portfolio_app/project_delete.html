@@ -1,0 +1,18 @@
+<!-- inherit from base.html -->
+{% extends 'portfolio_app/base_template.html' %}
+
+<!-- Replace block content in base_template.html -->
+{% block content %}
+    <!-- I printed out the id to debug-->
+    <p>Are you sure you want to delete "{{item}} with {{portfolio_id}}"?</p>
+
+    <form action="{% url 'delete_project' portfolio_id item.id%}" method="POST">
+
+        {% csrf_token %}
+        <!-- The problem was that I had an extra } in the href string-->
+        <a class="btn btn-primary" href="{% url 'portfolio-detail' portfolio_id%}" role="button">Cancel</a>
+        <input type="submit" name="Confirm">
+        
+    </form>
+
+{% endblock %}

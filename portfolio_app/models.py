@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -17,7 +18,7 @@ class Project(models.Model):
         return reverse('project-detail', args=[str(self.id)])
 
 class Portfolio(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, default="title")
     is_active = models.BooleanField(default = False)
     about = models.TextField(blank = True)
     contact_email = models.CharField(max_length=200, blank = True)
@@ -45,10 +46,11 @@ class Student(models.Model):
         ("DASE-BS", "BS in Data Analytics and Systems Engineering"),
     )
 
-
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     email = models.CharField("UCCS Email", max_length=200)
     major = models.CharField(max_length=200, choices=MAJOR, blank = True)
+    profile_pic = models.ImageField(null=True, blank=True)
 
     #one student has a portfolio and each portfolio belongs to a student
     portfolio = models.OneToOneField(Portfolio, null = True, on_delete=models.CASCADE, unique=True)

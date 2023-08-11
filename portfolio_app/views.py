@@ -2,8 +2,13 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
 from django.views import generic
-from .forms import ProjectForm
+from .forms import ProjectForm, CreateUserForm, StudentForm, PortfolioForm
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .decorators import  allowed_users
+from django.contrib.auth.models import Group
 
 # Create your views here.
 
@@ -18,15 +23,16 @@ def index(request):
 
 #implement class that inherits from a generic list view
 #this will query the database to get all records
-class StudentListView(generic.ListView):
+
+class StudentListView(LoginRequiredMixin, generic.ListView):
     model = Student
     
-class StudentDetailView(generic.DetailView):
+class StudentDetailView(LoginRequiredMixin, generic.DetailView):
     model = Student
 
 
 
-class PortfolioListView(generic.ListView):
+class PortfolioListView(LoginRequiredMixin, generic.ListView):
     model = Portfolio
     
 class PortfolioDetailView(generic.DetailView):
@@ -45,13 +51,14 @@ class PortfolioDetailView(generic.DetailView):
         return context
 
 
-class ProjectListView(generic.ListView):
+class ProjectListView(LoginRequiredMixin,generic.ListView):
     model = Project
     
 class ProjectDetailView(generic.DetailView):
     model = Project
 
-
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['student'])
 def createProject(request, portfolio_id):
     form = ProjectForm()
     portfolio = Portfolio.objects.get(pk=portfolio_id)
@@ -72,7 +79,8 @@ def createProject(request, portfolio_id):
     context = {'form' :form}
     return render(request, 'portfolio_app/project_form.html', context)  
 
-
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['student'])
 def updateProject(request, portfolio_id, project_id):
     project = Project.objects.get(id=project_id)
     form = ProjectForm(instance=project)
@@ -92,7 +100,29 @@ def updateProject(request, portfolio_id, project_id):
     context = {'form' :form}
     return render(request, 'portfolio_app/project_form.html', context)  
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['student'])
+def updatePortfolio(request, portfolio_id):
+    portfolio = Portfolio.objects.get(id=portfolio_id)
+    form = PortfolioForm(instance=portfolio)
 
+
+    if request.method == 'POST':
+        # Retrieve the portfolio based on the portfolio_id
+        print('printing POST:', request.POST)
+        print('portfolio:', portfolio_id)
+        form = PortfolioForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+        # Redirect back to the portfolio detail page
+            return redirect('portfolio-detail', portfolio_id)
+
+    context = {'form' :form}
+    return render(request, 'portfolio_app/portfolio_form.html', context)  
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['student'])
 def deleteProject(request, portfolio_id, project_id):
     project = Project.objects.get(id=project_id)
     print('portfolio_id ', portfolio_id)
@@ -104,3 +134,46 @@ def deleteProject(request, portfolio_id, project_id):
     
     context = {'item':project, 'portfolio_id':portfolio_id}
     return render(request, 'portfolio_app/project_delete.html', context)
+
+
+def registerPage(request):
+
+    form = CreateUserForm()
+    
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            username  = form.cleaned_data.get('username')
+            group = Group.objects.get(name='student')
+            user.groups.add(group)
+            student = Student.objects.create(user=user,) 
+            portfolio = Portfolio.objects.create()  
+            student.portfolio = portfolio 
+            student.save()
+
+            messages.success(request, 'Account wsa created for ' + username)
+            return redirect('login')
+
+    context ={'form':form}
+    return render(request, 'registration/register.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['student'])
+def userPage(request):
+    student = request.user.student
+    
+    form = StudentForm(instance = student)
+    print('student', student)
+    portfolio = student.portfolio
+    print(portfolio)
+
+    if request.method == 'POST':
+        form = StudentForm(request.POST, request.FILES, instance=student)
+        if form.is_valid():
+            form.save()
+
+    context = {'portfolios':portfolio, 'form':form}
+    #context ={}
+    return render(request, 'portfolio_app/user.html', context)
+

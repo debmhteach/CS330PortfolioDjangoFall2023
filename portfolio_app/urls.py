@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+
 
 urlpatterns = [
     #path function defines a url pattern
@@ -24,5 +25,21 @@ urlpatterns = [
     path('portfolio/<int:portfolio_id>/create_project/', views.createProject, name='create_project'),
     path('portfolio/<int:portfolio_id>/update_project/<int:project_id>', views.updateProject, name='update_project'),
     path('portfolio/<int:portfolio_id>/delete_project/<int:project_id>', views.deleteProject, name='delete_project'),
+    path('user/', views.userPage, name ='user_page'),
+    path('portfolio/update_portfolio/<int:portfolio_id>', views.updatePortfolio, name='update_portfolio'),
+    #user accounts 
+    #the following include automatically maps the following urls
+    #accounts/ login/ [name='login']
+    #accounts/ logout/ [name='logout']
+    #accounts/ password_change/ [name='password_change']
+    #accounts/ password_change/done/ [name='password_change_done']
+    #accounts/ password_reset/ [name='password_reset']
+    #accounts/ password_reset/done/ [name='password_reset_done']
+    #accounts/ reset/<uidb64>/<token>/ [name='password_reset_confirm']
+    #accounts/ reset/done/ [name='password_reset_complete']
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/register/', views.registerPage, name = 'register_page') ,
+    
+  
 ]
 
